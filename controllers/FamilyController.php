@@ -72,7 +72,7 @@ class FamilyController
         if (isset($_SESSION['id'])) {
 
             $erreur = '';
-            $list = $this->familyManager->memberList();
+            $list = $this->familyManager->getListUpdate();
             $info = $this->familyManager->getInfo($_GET['num']);
             if (isset($_POST['signup'])) {
                 if (!empty($_POST['f_name']) && !empty($_POST['l_name']) && !empty($_POST['mail'])  && !empty($_POST['birth_date']) && !empty($_POST['birth_city']) && !empty($_POST['pwd']) && !empty($_POST['cpwd'])) {
@@ -93,7 +93,8 @@ class FamilyController
                         if ($pwd === $cpwd) {
 
                             $update = $this->familyManager->update($_GET['num'], $f_name, $l_name, $mail, $birth_date, $birth_city, $pwd, $idTm);
-                            if ($update === true) {
+                            if ($update['message'] === true) {
+                                $_SESSION['idTm']= $update['idTm'];
                                 header("Location:membre");
                             }
                         } else {

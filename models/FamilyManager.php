@@ -69,7 +69,7 @@ class FamilyManager extends Model
 
         $req_mem = $this->getBdd()->prepare("SELECT idTm,name FROM typemembre WHERE name != 'Père' AND name != 'Mère' ");
 
-        if ($req_mem->execute() === true) {
+        if ($req_mem->execute()) {
             $listMe = $req_mem->fetchAll(PDO::FETCH_ASSOC);
             return $listMe;
         } else {
@@ -80,13 +80,22 @@ class FamilyManager extends Model
     #Modifier un utilisateur
     public function update($id, $f_name, $l_name, $mail, $birth_date, $birth_city, $pwd, $idTm)
     {
+        $result = [];
         $pwd = password_hash($pwd, PASSWORD_BCRYPT);
         $req = $this->getBdd()->prepare("UPDATE utilisateur set f_name='$f_name' ,l_name='$l_name' ,mail='$mail' ,birth_date='$birth_date' ,birth_city='$birth_city' ,pwd='$pwd' ,idTm=$idTm WHERE idUt=$id ");
 
         if ($req->execute()) {
-            return true;
+            $result = [
+                'message' => true,
+                'idTm' => $idTm,
+
+            ];
+            return $result;
         } else {
-            return false;
+            $result = [
+                'message' => false,
+            ];
+           return $result;
         }
     }
 
@@ -95,11 +104,49 @@ class FamilyManager extends Model
     {
         $req = $this->getBdd()->prepare("SELECT * FROM utilisateur WHERE idUt=$id ");
 
-        if ($req->execute() === true) {
+        if ($req->execute()) {
             $list = $req->fetchAll(PDO::FETCH_ASSOC);
             return $list[0];
         } else {
-            return "Requête non exécutée";
+            return $list[0]=[];
+        }
+    }
+
+    public function verifyType($id)
+    {
+       
+        $req = $this->getBdd()->prepare("SELECT idTm FROM utilisateur WHERE idUt=$id");
+
+        if ($req->execute()) {
+            $result = $req->fetchAll(PDO::FETCH_ASSOC);
+            return $result[0];
+        } else {
+            $result[0] = [];
+        }
+    }
+
+    public function getListUpdate()
+    {
+        $verif = $this->verifyType($_GET['num']);
+       
+
+        if ($verif['idTm'] == 6 || $verif['idTm'] == 7) {
+            $req_mem = $this->getBdd()->prepare("SELECT idTm,name FROM typemembre WHERE name = 'Père' OR name = 'Mère' ");
+            if ($req_mem->execute()) {
+                $listMe = $req_mem->fetchAll(PDO::FETCH_ASSOC);
+                return $listMe;
+            } else {
+                  return [];
+                }
+            }else{
+                $req_mem = $this->getBdd()->prepare("SELECT idTm,name FROM typemembre WHERE name != 'Père' AND name != 'Mère' ");
+
+                if ($req_mem->execute()) {
+                    $listMe = $req_mem->fetchAll(PDO::FETCH_ASSOC);
+                    return $listMe;
+            }else{
+                return [];
+            }
         }
     }
 }

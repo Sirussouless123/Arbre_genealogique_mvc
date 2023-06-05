@@ -80,7 +80,7 @@ class AuthController
             if (!empty($_POST['mail']) && !empty($_POST['pwd'])) {
                 $mail = $_POST['mail'];
                 $pwd = $_POST['pwd'];
-                $verif1 = $this->authManager->userExist($mail, $pwd);
+                $verif1 = $this->authManager->userExist($mail);
                 $verif2 = $this->authManager->userAdmin($mail, $pwd);
 
                 if ($verif1 === 1) {
